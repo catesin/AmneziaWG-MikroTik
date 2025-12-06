@@ -99,13 +99,13 @@ add action=mark-routing chain=output connection-mark=to-vpn-conn-local \
 Перед запуском контейнера в RouteOS убедитесь что у вас [включены контейнеры](https://help.mikrotik.com/docs/spaces/ROS/pages/84901929/Container). 
 С полным списком поддерживаемых устройств можно ознакомится [тут](https://mikrotik.com/products/matrix). 
 
-:warning: Предполагается что на устройстве (или если есть USB порт с флешкой) имеется +- 40 Мбайт свободного места для разворачивания контейнера внутри RouterOS. Сам контейнер весит не более 25 Мбайт. Если места не хватает, его можно временно расширить [за счёт оперативной памяти](https://www.youtube.com/watch?v=uZKTqRtXu4M). После перезагрузки RouterOS, всё что находится в RAM, стирается. 
+:warning: Предполагается что на устройстве (или если есть USB порт с флешкой) имеется +- 40 Мбайт свободного места для разворачивания контейнера внутри RouterOS. Сам контейнер весит не более 25 Мбайт. Если места не хватает, его можно временно расширить [за счёт оперативной памяти](https://help.mikrotik.com/docs/spaces/ROS/pages/91193346/Disks#Disks-AllocateRAMtofolder). После перезагрузки RouterOS, всё что находится в RAM, стирается. 
 
 
 <a name='MikroTik_container_1'></a>
 ### Включение функции контейнеров в RouterOS
 
-Основная инструкция по включению функции контейнеров находится [ТУТ](https://youtu.be/8u1PVouAGnk?si=FDhxUX387q6kpiWR&t=83) или [ТУТ](https://www.google.com/search?q=%D0%9A%D0%B0%D0%BA+%D0%B2%D0%BA%D0%BB%D1%8E%D1%87%D0%B8%D1%82%D1%8C+%D0%BA%D0%BE%D0%BD%D1%82%D0%B5%D0%B9%D0%BD%D0%B5%D1%80%D1%8B+%D0%B2+mikrotik&oq=%D0%BA%D0%B0%D0%BA+%D0%B2%D0%BA%D0%BB%D1%8E%D1%87%D0%B8%D1%82%D1%8C+%D0%BA%D0%BE%D0%BD%D1%82%D0%B5%D0%B9%D0%BD%D0%B5%D1%80%D1%8B+%D0%B2+mikrotik)
+Основная инструкция по включению функции контейнеров находится [ТУТ](https://help.mikrotik.com/docs/spaces/ROS/pages/84901929/Container#Container-Summary) или [ТУТ](https://www.google.com/search?q=%D0%9A%D0%B0%D0%BA+%D0%B2%D0%BA%D0%BB%D1%8E%D1%87%D0%B8%D1%82%D1%8C+%D0%BA%D0%BE%D0%BD%D1%82%D0%B5%D0%B9%D0%BD%D0%B5%D1%80%D1%8B+%D0%B2+mikrotik&oq=%D0%BA%D0%B0%D0%BA+%D0%B2%D0%BA%D0%BB%D1%8E%D1%87%D0%B8%D1%82%D1%8C+%D0%BA%D0%BE%D0%BD%D1%82%D0%B5%D0%B9%D0%BD%D0%B5%D1%80%D1%8B+%D0%B2+mikrotik)
 
 Порядок действий выглядит так: 
 
@@ -157,7 +157,14 @@ docker buildx build --build-arg ARCHITECTURE=amd64 --no-cache --platform linux/a
 ### Настройка контейнера в RouterOS
 
 В текущем примере на устройстве MikroTik флешки нет. Хранить будем всё в корне.
-Если у вас есть USB порт и флешка, лучше размещать контейнер на ней.  Можно комбинировать память загрузив образ в расшаренный диск [за счёт оперативной памяти](https://www.youtube.com/watch?v=uZKTqRtXu4M), а сам контейнер разворачивать в постоянной памяти.
+Если у вас есть USB порт и флешка, лучше размещать контейнер на ней.  Можно комбинировать память,развернув "tmp" каталог (создадим его чуть ниже) в расшаренный диск [за счёт оперативной памяти](https://help.mikrotik.com/docs/spaces/ROS/pages/91193346/Disks#Disks-AllocateRAMtofolder), а сам контейнер разворачивать в постоянной памяти.
+
+Пример использования RAM в качестве временного хранилища размером 100 Мегабайт (не обязательно)
+
+```
+/disk
+add slot=ram tmpfs-max-size=100M type=tmpfs
+```
 
 :exclamation:**Если контейнер не запускается на флешке.**
 Например, вы хотите разместить контейнер в каталоге /usb1/docker/awg. Не создавайте заранее каталог awg на USB-флеш-накопителе. При создании контейнера добавьте в команду распаковки параметр "root-dir=usb1/docker/awg", в этом случае контейнер распакуется самостоятельно, создав каталог /usb1/docker/awg и запустится без проблем.
